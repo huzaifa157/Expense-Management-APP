@@ -1,0 +1,55 @@
+import { DarkTheme, DefaultTheme, NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { ActivityIndicator, View } from "react-native";
+import { StatusBar } from "expo-status-bar";
+
+import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
+
+import LoginScreen from "../screens/auth/LoginScreen";
+import RegisterScreen from "../screens/auth/RegisterScreen";
+import EditTransactionScreen from "../screens/EditTransactionScreen";
+
+import BottomTabs from "./BottomTab";
+
+const Stack = createNativeStackNavigator();
+
+function SplashLoader() {
+  return (
+    <View className="flex-1 items-center justify-center bg-white dark:bg-gray-900">
+      <ActivityIndicator size="large" color="#2563eb" />
+    </View>
+  );
+}
+
+export default function AppNavigator() {
+  const { isLoggedIn, isLoading } = useAuth();
+  const { isDark } = useTheme();
+
+  if (isLoading) {
+    return <SplashLoader />;
+  }
+
+  return (
+    <NavigationContainer theme={isDark ? DarkTheme : DefaultTheme}>
+      <StatusBar style={isDark ? "light" : "dark"} />
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
+        {isLoggedIn ? (
+          <>
+            <Stack.Screen name="Main" component={BottomTabs} />
+            <Stack.Screen name="EditTransaction" component={EditTransactionScreen} />
+          </>
+        ) : (
+          <>
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="Register" component={RegisterScreen} />
+          </>
+        )}
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
