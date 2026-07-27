@@ -40,10 +40,14 @@
     "typescript": "~6.0.3"
   },
   "scripts": {
+    "prestart": "node ./scripts/set-lan-ip.js",
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
+    "preandroid": "node ./scripts/set-lan-ip.js",
     "android": "expo start --android",
+    "preios": "node ./scripts/set-lan-ip.js",
     "ios": "expo start --ios",
+    "preweb": "node ./scripts/set-lan-ip.js",
     "web": "expo start --web",
     "lint": "expo lint"
   },
