@@ -1,10 +1,14 @@
-import { Alert, Share, Switch, Text, TouchableOpacity, View } from "react-native";
+import { useState } from "react";
+import { Alert, Modal, ScrollView, Share, Switch, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
 
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import { CURRENCIES, useCurrency } from "../context/CurrencyContext";
-import { getExpenses } from "../services/expenseService";
+import { getExpenses, importExpenses } from "../services/expenseService";
+import CustomButton from "../components/CustomButton";
 
 const toCsvValue = (value) => `"${String(value ?? "").replace(/"/g, '""')}"`;
 
@@ -26,12 +30,62 @@ export default function SettingsScreen() {
   const { user, logout } = useAuth();
   const { isDark, toggleTheme } = useTheme();
   const { currency, changeCurrency } = useCurrency();
+  const navigation = useNavigation();
+
+  const [restoreVisible, setRestoreVisible] = useState(false);
+  const [restoreText, setRestoreText] = useState("");
+  const [restoring, setRestoring] = useState(false);
 
   const handleLogout = () => {
     Alert.alert("Logout", "Are you sure you want to log out?", [
       { text: "Cancel", style: "cancel" },
       { text: "Logout", style: "destructive", onPress: logout },
     ]);
+  };
+
+  const handleBackup = async () => {
+    try {
+      const response = await getExpenses({ limit: 500, sort: "date_desc" });
+
+      if (!response.success || response.data.length === 0) {
+        Alert.alert("Nothing to back up", "You don't have any transactions yet.");
+        return;
+      }
+
+      await Share.share({
+        title: "Expense backup",
+        message: JSON.stringify(response.data, null, 2),
+      });
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Error", "Could not create backup.");
+    }
+  };
+
+  const handleRestore = async () => {
+    let parsed;
+    try {
+      parsed = JSON.parse(restoreText);
+    } catch (error) {
+      Alert.alert("Invalid JSON", "Paste the exact JSON from a backup export.");
+      return;
+    }
+
+    const expenses = Array.isArray(parsed) ? parsed : [parsed];
+
+    setRestoring(true);
+    try {
+      const response = await importExpenses(expenses);
+      if (response.success) {
+        Alert.alert("Restore complete", response.message);
+        setRestoreText("");
+        setRestoreVisible(false);
+      } else {
+        Alert.alert("Error", response.message || "Could not restore backup.");
+      }
+    } finally {
+      setRestoring(false);
+    }
   };
 
   const handleExport = async () => {
@@ -56,7 +110,7 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50 dark:bg-gray-900">
-      <View className="px-6 pt-4">
+      <ScrollView className="px-6 pt-4" contentContainerStyle={{ paddingBottom: 32 }}>
         <Text className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Settings</Text>
 
         <View className="bg-white dark:bg-gray-800 rounded-xl p-5 mb-6">
@@ -114,11 +168,47 @@ export default function SettingsScreen() {
         </View>
 
         <TouchableOpacity
+          onPress={() => navigation.navigate("Budgets")}
+          className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 rounded-xl mb-3 flex-row items-center justify-between"
+        >
+          <Text className="font-bold text-lg text-gray-900 dark:text-white">Budgets</Text>
+          <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => navigation.navigate("Recurring")}
+          className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 rounded-xl mb-4 flex-row items-center justify-between"
+        >
+          <Text className="font-bold text-lg text-gray-900 dark:text-white">
+            Recurring Transactions
+          </Text>
+          <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
           onPress={handleExport}
           className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 rounded-xl mb-4"
         >
           <Text className="text-center font-bold text-lg text-gray-900 dark:text-white">
             Export Transactions (CSV)
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={handleBackup}
+          className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 rounded-xl mb-3"
+        >
+          <Text className="text-center font-bold text-lg text-gray-900 dark:text-white">
+            Backup (JSON)
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => setRestoreVisible(true)}
+          className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 rounded-xl mb-4"
+        >
+          <Text className="text-center font-bold text-lg text-gray-900 dark:text-white">
+            Restore from Backup
           </Text>
         </TouchableOpacity>
 
@@ -130,7 +220,46 @@ export default function SettingsScreen() {
             Logout
           </Text>
         </TouchableOpacity>
-      </View>
+      </ScrollView>
+
+      <Modal visible={restoreVisible} animationType="slide" transparent>
+        <View className="flex-1 bg-black/50 justify-end">
+          <View className="bg-white dark:bg-gray-800 rounded-t-2xl p-6">
+            <Text className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+              Restore from Backup
+            </Text>
+            <Text className="text-gray-400 dark:text-gray-500 text-xs mb-3">
+              Paste the JSON text from a previous "Backup (JSON)" export below.
+            </Text>
+
+            <TextInput
+              value={restoreText}
+              onChangeText={setRestoreText}
+              multiline
+              placeholder="[ { ... }, { ... } ]"
+              placeholderTextColor="#9ca3af"
+              className="border border-gray-300 dark:border-gray-600 rounded-xl p-3 text-gray-900 dark:text-white h-40 mb-4"
+              textAlignVertical="top"
+            />
+
+            <View className="flex-row">
+              <View className="flex-1 mr-2">
+                <CustomButton
+                  title="Cancel"
+                  variant="outline"
+                  onPress={() => {
+                    setRestoreVisible(false);
+                    setRestoreText("");
+                  }}
+                />
+              </View>
+              <View className="flex-1 ml-2">
+                <CustomButton title="Restore" onPress={handleRestore} disabled={restoring} />
+              </View>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }

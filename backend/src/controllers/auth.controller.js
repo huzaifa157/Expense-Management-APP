@@ -96,7 +96,26 @@ const loginUser = async (req, res) => {
 
 
 
+const savePushToken = async (req, res) => {
+  try {
+    const { pushToken } = req.body;
+
+    await User.findByIdAndUpdate(req.user.id, { pushToken });
+
+    res.status(200).json({
+      success: true,
+      message: "Push token saved",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+
 module.exports = {
-  registerUser , loginUser
+  registerUser , loginUser , savePushToken
 
 };

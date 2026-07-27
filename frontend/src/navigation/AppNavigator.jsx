@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { DarkTheme, DefaultTheme, NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { ActivityIndicator, View } from "react-native";
@@ -5,10 +6,13 @@ import { StatusBar } from "expo-status-bar";
 
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
+import { registerForPushNotificationsAsync } from "../utils/notifications";
 
 import LoginScreen from "../screens/auth/LoginScreen";
 import RegisterScreen from "../screens/auth/RegisterScreen";
 import EditTransactionScreen from "../screens/EditTransactionScreen";
+import BudgetsScreen from "../screens/BudgetsScreen";
+import RecurringScreen from "../screens/RecurringScreen";
 
 import BottomTabs from "./BottomTab";
 
@@ -26,6 +30,12 @@ export default function AppNavigator() {
   const { isLoggedIn, isLoading } = useAuth();
   const { isDark } = useTheme();
 
+  useEffect(() => {
+    if (isLoggedIn) {
+      registerForPushNotificationsAsync();
+    }
+  }, [isLoggedIn]);
+
   if (isLoading) {
     return <SplashLoader />;
   }
@@ -42,6 +52,8 @@ export default function AppNavigator() {
           <>
             <Stack.Screen name="Main" component={BottomTabs} />
             <Stack.Screen name="EditTransaction" component={EditTransactionScreen} />
+            <Stack.Screen name="Budgets" component={BudgetsScreen} />
+            <Stack.Screen name="Recurring" component={RecurringScreen} />
           </>
         ) : (
           <>

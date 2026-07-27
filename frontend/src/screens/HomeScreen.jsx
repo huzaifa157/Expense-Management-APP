@@ -6,6 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "../context/AuthContext";
 import { useCurrency } from "../context/CurrencyContext";
 import { getExpenses } from "../services/expenseService";
+import { getBudgets } from "../services/budgetService";
 
 export default function HomeScreen() {
   const { user } = useAuth();
@@ -14,6 +15,7 @@ export default function HomeScreen() {
 
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [overallBudget, setOverallBudget] = useState(null);
 
   const loadExpenses = useCallback(async () => {
     try {
@@ -21,6 +23,11 @@ export default function HomeScreen() {
 
       if (response.success) {
         setExpenses(response.data);
+      }
+
+      const budgetResponse = await getBudgets();
+      if (budgetResponse.success) {
+        setOverallBudget(budgetResponse.data.find((b) => b.category === "Overall") || null);
       }
     } catch (error) {
       console.log(error);
@@ -60,10 +67,11 @@ export default function HomeScreen() {
               {user?.name || "there"} 👋
             </Text>
 
-            <View className="bg-blue-600 rounded-2xl p-6 mb-4">
+            <View className={`rounded-2xl p-6 mb-4 ${balance < 0 ? "bg-red-600" : "bg-blue-600"}`}>
               <Text className="text-blue-100 text-sm">Current Balance</Text>
               <Text className="text-white text-4xl font-bold mt-1">
-                {formatCurrency(balance)}
+                {balance < 0 ? "-" : ""}
+                {formatCurrency(Math.abs(balance))}
               </Text>
 
               <View className="flex-row justify-between mt-6">
@@ -82,6 +90,41 @@ export default function HomeScreen() {
                 </View>
               </View>
             </View>
+
+            {!!overallBudget && (
+              <TouchableOpacity
+                onPress={() => navigation.navigate("Budgets")}
+                className="bg-white dark:bg-gray-800 rounded-2xl p-4 mb-4"
+              >
+                <View className="flex-row justify-between mb-2">
+                  <Text className="font-semibold text-gray-900 dark:text-white">
+                    Monthly Budget
+                  </Text>
+                  <Text className="text-gray-400 dark:text-gray-500 text-xs">
+                    {overallBudget.percent}%
+                  </Text>
+                </View>
+
+                <View className="h-2 rounded-full bg-gray-100 dark:bg-gray-700 overflow-hidden">
+                  <View
+                    style={{
+                      width: `${Math.min(overallBudget.percent, 100)}%`,
+                      backgroundColor:
+                        overallBudget.percent >= 100
+                          ? "#ef4444"
+                          : overallBudget.percent >= 80
+                          ? "#f59e0b"
+                          : "#2563eb",
+                    }}
+                    className="h-2 rounded-full"
+                  />
+                </View>
+
+                <Text className="text-gray-400 dark:text-gray-500 text-xs mt-2">
+                  {formatCurrency(overallBudget.spent)} of {formatCurrency(overallBudget.monthlyLimit)}
+                </Text>
+              </TouchableOpacity>
+            )}
 
             <Text className="text-lg font-bold text-gray-900 dark:text-white mb-2">
               Recent Transactions

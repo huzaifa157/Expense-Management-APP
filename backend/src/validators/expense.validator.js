@@ -18,6 +18,8 @@ const expenseSchema = Joi.object({
   date: Joi.date().required(),
 
   notes: Joi.string().trim().allow("").optional(),
+
+  receiptImage: Joi.string().allow("").optional(),
 });
 
 const expenseQuerySchema = Joi.object({

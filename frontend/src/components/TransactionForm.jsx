@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Alert, Image, Text, TextInput, TouchableOpacity, View } from "react-native";
+import * as ImagePicker from "expo-image-picker";
 
 import CustomInput from "./CustomInput";
 import CustomButton from "./CustomButton";
@@ -65,6 +66,7 @@ export default function TransactionForm({
   const [dateMode, setDateMode] = useState(initialDate.dateMode);
   const [customDate, setCustomDate] = useState(initialDate.customDate);
   const [attemptedSubmit, setAttemptedSubmit] = useState(false);
+  const [receiptImage, setReceiptImage] = useState(initialValues?.receiptImage || "");
 
   const categories = type === "expense" ? EXPENSE_CATEGORIES : INCOME_CATEGORIES;
   const accentColor = type === "expense" ? "#ef4444" : "#16a34a";
@@ -105,7 +107,35 @@ export default function TransactionForm({
     setNotes(initialValues?.notes || "");
     setDateMode(resetDate.dateMode);
     setCustomDate(resetDate.customDate);
+    setReceiptImage(initialValues?.receiptImage || "");
     setAttemptedSubmit(false);
+  };
+
+  const pickReceiptImage = async (fromCamera) => {
+    const permission = fromCamera
+      ? await ImagePicker.requestCameraPermissionsAsync()
+      : await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permission.granted) {
+      Alert.alert("Permission needed", "Allow access to attach a receipt photo.");
+      return;
+    }
+
+    const pickerOptions = {
+      mediaTypes: ["images"],
+      quality: 0.5,
+      base64: true,
+    };
+
+    const result = fromCamera
+      ? await ImagePicker.launchCameraAsync(pickerOptions)
+      : await ImagePicker.launchImageLibraryAsync(pickerOptions);
+
+    if (!result.canceled && result.assets?.[0]?.base64) {
+      const asset = result.assets[0];
+      const mime = asset.mimeType || "image/jpeg";
+      setReceiptImage(`data:${mime};base64,${asset.base64}`);
+    }
   };
 
   const handleSubmit = () => {
@@ -122,6 +152,7 @@ export default function TransactionForm({
       category,
       date: resolveDateFromMode(dateMode, customDate).toISOString(),
       notes: notes.trim(),
+      receiptImage,
     });
   };
 
@@ -264,6 +295,42 @@ export default function TransactionForm({
           onChangeText={setCustomDate}
           error={attemptedSubmit ? errors.date : undefined}
         />
+      )}
+
+      <Text className="text-gray-700 dark:text-gray-300 font-semibold mb-1">Receipt</Text>
+      <Text className="text-gray-400 dark:text-gray-500 text-xs mb-2">
+        Optional — keep a photo for your records; it won't fill in the amount for you.
+      </Text>
+
+      {receiptImage ? (
+        <View className="mb-4">
+          <Image
+            source={{ uri: receiptImage }}
+            style={{ width: "100%", height: 160, borderRadius: 12 }}
+            resizeMode="cover"
+          />
+          <TouchableOpacity onPress={() => setReceiptImage("")} className="mt-2 self-start">
+            <Text className="text-red-500 text-sm">Remove photo</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <View className="flex-row mb-4">
+          <TouchableOpacity
+            onPress={() => pickReceiptImage(true)}
+            className="flex-1 flex-row items-center justify-center border border-gray-300 dark:border-gray-600 rounded-xl py-3 mr-2"
+          >
+            <Ionicons name="camera" size={18} color="#6b7280" />
+            <Text className="text-gray-600 dark:text-gray-300 ml-2">Camera</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => pickReceiptImage(false)}
+            className="flex-1 flex-row items-center justify-center border border-gray-300 dark:border-gray-600 rounded-xl py-3 ml-2"
+          >
+            <Ionicons name="image" size={18} color="#6b7280" />
+            <Text className="text-gray-600 dark:text-gray-300 ml-2">Gallery</Text>
+          </TouchableOpacity>
+        </View>
       )}
 
       <CustomInput

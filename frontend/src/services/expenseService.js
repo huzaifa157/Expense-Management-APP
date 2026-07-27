@@ -30,3 +30,10 @@ export const updateExpense = async (id, expense) => {
 export const deleteExpense = async (id) => {
   return apiRequest(`/expenses/${id}`, { method: "DELETE" });
 };
+
+export const importExpenses = async (expenses) => {
+  return apiRequest("/expenses/import", {
+    method: "POST",
+    body: JSON.stringify({ expenses }),
+  });
+};

@@ -6,6 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { getExpenses } from "../services/expenseService";
 import { useCurrency } from "../context/CurrencyContext";
+import PieChart from "../components/PieChart";
 
 const startOfMonth = (date) => new Date(date.getFullYear(), date.getMonth(), 1);
 const startOfNextMonth = (date) => new Date(date.getFullYear(), date.getMonth() + 1, 1);
@@ -78,11 +79,13 @@ export default function StatisticsScreen() {
   const expenseBreakdown = buildBreakdown(expenseItems);
   const incomeBreakdown = buildBreakdown(incomeItems);
 
-  const renderBreakdown = (title, breakdown, barColor, emptyLabel) => (
+  const renderBreakdown = (title, breakdown, barColor, emptyLabel, showChart) => (
     <>
       <Text className="text-lg font-bold text-gray-900 dark:text-white mb-3 mt-2">
         {title}
       </Text>
+
+      {showChart && <PieChart data={breakdown} />}
 
       {breakdown.length === 0 && !loading && (
         <Text className="text-center text-gray-400 dark:text-gray-500 mb-4">
@@ -164,7 +167,8 @@ export default function StatisticsScreen() {
           "Spending by Category",
           expenseBreakdown,
           "bg-blue-600",
-          "No expenses recorded this month"
+          "No expenses recorded this month",
+          true
         )}
 
         {renderBreakdown(

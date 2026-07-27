@@ -1,4 +1,4 @@
-# Expense Management App
+ # Expense Management App
 
 A full-stack personal expense tracker: a React Native (Expo) mobile app backed by a Node.js/Express + MongoDB API.
 
