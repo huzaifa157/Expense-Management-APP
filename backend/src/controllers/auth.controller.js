@@ -5,11 +5,13 @@ const bcrypt = require("bcryptjs");
 const { sendResetCodeEmail } = require("../utils/sendEmail");
 
 const hashCode = (code) => crypto.createHash("sha256").update(code).digest("hex");
+const normalizeEmail = (email) => email.trim().toLowerCase();
 
 
 const registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, password } = req.body;
+    const email = normalizeEmail(req.body.email);
 
     const existingUser = await User.findOne({ email });
 
@@ -50,7 +52,8 @@ const registerUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { password } = req.body;
+    const email = normalizeEmail(req.body.email);
 
     // Find user
     const user = await User.findOne({ email });
@@ -102,7 +105,7 @@ const loginUser = async (req, res) => {
 
 const forgotPassword = async (req, res) => {
   try {
-    const { email } = req.body;
+    const email = normalizeEmail(req.body.email);
 
     const user = await User.findOne({ email });
 
@@ -137,7 +140,8 @@ const forgotPassword = async (req, res) => {
 
 const resetPassword = async (req, res) => {
   try {
-    const { email, code, newPassword } = req.body;
+    const { code, newPassword } = req.body;
+    const email = normalizeEmail(req.body.email);
 
     const user = await User.findOne({
       email,
