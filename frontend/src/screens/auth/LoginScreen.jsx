@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { Text, Alert } from "react-native";
+import { Text, Alert, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
 
 import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
+import AppLogo from "../../components/AppLogo";
 
 import { useAuth } from "../../context/AuthContext";
 import { loginUser } from "../../services/authService";
@@ -45,12 +47,23 @@ export default function LoginScreen({ navigation }) {
 
   return (
     <SafeAreaView className="flex-1 justify-center bg-white dark:bg-gray-900 px-6">
-      <Text className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
-        Welcome Back 👋
+      {navigation.canGoBack() && (
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          className="w-9 h-9 rounded-full bg-gray-50 dark:bg-gray-800 items-center justify-center mb-4 border border-gray-100 dark:border-gray-700"
+        >
+          <Ionicons name="arrow-back" size={18} color="#2563eb" />
+        </TouchableOpacity>
+      )}
+
+      <AppLogo />
+
+      <Text className="text-3xl font-extrabold text-gray-900 dark:text-white mb-1 tracking-tight">
+        Welcome Back
       </Text>
 
-      <Text className="text-gray-500 dark:text-gray-400 mb-8">
-        Sign in to continue
+      <Text className="text-gray-400 dark:text-gray-500 mb-8">
+        Sign in to continue tracking your expenses
       </Text>
 
       <CustomInput
@@ -71,6 +84,13 @@ export default function LoginScreen({ navigation }) {
         onPress={handleLogin}
         disabled={submitting}
       />
+
+      <Text
+        className="text-center text-blue-600 mt-4"
+        onPress={() => navigation.navigate("ForgotPassword")}
+      >
+        Forgot password?
+      </Text>
 
       <Text
         className="text-center text-blue-600 mt-6"

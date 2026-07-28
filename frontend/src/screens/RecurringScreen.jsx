@@ -109,20 +109,23 @@ export default function RecurringScreen() {
     <SafeAreaView className="flex-1 bg-gray-50 dark:bg-gray-900">
       <View className="px-6 pt-4 pb-2 flex-row items-center justify-between">
         <View className="flex-row items-center">
-          <TouchableOpacity onPress={() => navigation.goBack()} className="mr-3">
-            <Ionicons name="arrow-back" size={24} color="#2563eb" />
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            className="w-9 h-9 rounded-full bg-white dark:bg-gray-800 items-center justify-center mr-3 shadow-sm border border-gray-100 dark:border-gray-700"
+          >
+            <Ionicons name="arrow-back" size={18} color="#2563eb" />
           </TouchableOpacity>
           <Text className="text-2xl font-bold text-gray-900 dark:text-white">Recurring</Text>
         </View>
 
-        <TouchableOpacity onPress={() => setShowForm((prev) => !prev)}>
-          <Ionicons name={showForm ? "close-circle" : "add-circle"} size={30} color="#2563eb" />
+        <TouchableOpacity onPress={() => setShowForm((prev) => !prev)} activeOpacity={0.8}>
+          <Ionicons name={showForm ? "close-circle" : "add-circle"} size={32} color="#2563eb" />
         </TouchableOpacity>
       </View>
 
       <ScrollView className="px-6 pt-2" contentContainerStyle={{ paddingBottom: 32 }}>
         {showForm && (
-          <View className="bg-white dark:bg-gray-800 rounded-xl p-4 mb-4">
+          <View className="bg-white dark:bg-gray-800 rounded-2xl p-4 mb-4 shadow-sm border border-gray-100 dark:border-gray-700">
             <View className="flex-row mb-4 bg-gray-100 dark:bg-gray-700 rounded-xl p-1">
               {["expense", "income"].map((t) => (
                 <TouchableOpacity
@@ -196,15 +199,20 @@ export default function RecurringScreen() {
         )}
 
         {items.length === 0 && !showForm && (
-          <Text className="text-center text-gray-400 dark:text-gray-500 mt-8">
-            No recurring transactions yet
-          </Text>
+          <View className="items-center mt-8">
+            <View className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 items-center justify-center mb-3">
+              <Ionicons name="repeat-outline" size={28} color="#9ca3af" />
+            </View>
+            <Text className="text-center text-gray-400 dark:text-gray-500">
+              No recurring transactions yet
+            </Text>
+          </View>
         )}
 
         {items.map((item) => (
           <View
             key={item._id}
-            className="bg-white dark:bg-gray-800 rounded-xl p-4 mb-3 flex-row items-center justify-between"
+            className="bg-white dark:bg-gray-800 rounded-2xl p-4 mb-3 flex-row items-center justify-between shadow-sm border border-gray-100 dark:border-gray-700"
           >
             <View className="flex-1 pr-3">
               <Text className="font-semibold text-gray-900 dark:text-white">{item.title}</Text>

@@ -158,14 +158,15 @@ export default function TransactionForm({
 
   return (
     <View>
-      <View className="flex-row mb-6 bg-gray-100 dark:bg-gray-800 rounded-xl p-1">
+      <View className="flex-row mb-6 bg-gray-100 dark:bg-gray-800 rounded-2xl p-1.5">
         <TouchableOpacity
           onPress={() => {
             setType("expense");
             setCategory("");
           }}
-          className={`flex-1 flex-row items-center justify-center py-3 rounded-lg ${
-            type === "expense" ? "bg-red-500" : ""
+          activeOpacity={0.85}
+          className={`flex-1 flex-row items-center justify-center py-3 rounded-xl shadow-sm ${
+            type === "expense" ? "bg-red-500" : "bg-transparent"
           }`}
         >
           <Ionicons
@@ -187,8 +188,9 @@ export default function TransactionForm({
             setType("income");
             setCategory("");
           }}
-          className={`flex-1 flex-row items-center justify-center py-3 rounded-lg ${
-            type === "income" ? "bg-green-600" : ""
+          activeOpacity={0.85}
+          className={`flex-1 flex-row items-center justify-center py-3 rounded-xl shadow-sm ${
+            type === "income" ? "bg-green-600" : "bg-transparent"
           }`}
         >
           <Ionicons
@@ -206,8 +208,8 @@ export default function TransactionForm({
         </TouchableOpacity>
       </View>
 
-      <View className="items-center mb-2">
-        <Text className="text-gray-400 dark:text-gray-500 text-sm mb-1">Amount</Text>
+      <View className="items-center mb-2 bg-gray-50 dark:bg-gray-800 rounded-2xl py-6">
+        <Text className="text-gray-400 dark:text-gray-500 text-sm mb-1 font-medium">Amount</Text>
 
         <View className="flex-row items-center">
           <Text className="text-3xl font-bold mr-1" style={{ color: accentColor }}>
@@ -303,32 +305,35 @@ export default function TransactionForm({
       </Text>
 
       {receiptImage ? (
-        <View className="mb-4">
+        <View key="receipt-preview" className="mb-4">
           <Image
             source={{ uri: receiptImage }}
-            style={{ width: "100%", height: 160, borderRadius: 12 }}
+            style={{ width: "100%", height: 160, borderRadius: 16 }}
             resizeMode="cover"
           />
-          <TouchableOpacity onPress={() => setReceiptImage("")} className="mt-2 self-start">
-            <Text className="text-red-500 text-sm">Remove photo</Text>
+          <TouchableOpacity onPress={() => setReceiptImage("")} className="mt-2 self-start flex-row items-center">
+            <Ionicons name="trash-outline" size={14} color="#ef4444" />
+            <Text className="text-red-500 text-sm ml-1">Remove photo</Text>
           </TouchableOpacity>
         </View>
       ) : (
-        <View className="flex-row mb-4">
+        <View key="receipt-picker" className="flex-row mb-4">
           <TouchableOpacity
             onPress={() => pickReceiptImage(true)}
-            className="flex-1 flex-row items-center justify-center border border-gray-300 dark:border-gray-600 rounded-xl py-3 mr-2"
+            activeOpacity={0.7}
+            className="flex-1 flex-row items-center justify-center bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl py-3.5 mr-2"
           >
             <Ionicons name="camera" size={18} color="#6b7280" />
-            <Text className="text-gray-600 dark:text-gray-300 ml-2">Camera</Text>
+            <Text className="text-gray-600 dark:text-gray-300 ml-2 font-medium">Camera</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             onPress={() => pickReceiptImage(false)}
-            className="flex-1 flex-row items-center justify-center border border-gray-300 dark:border-gray-600 rounded-xl py-3 ml-2"
+            activeOpacity={0.7}
+            className="flex-1 flex-row items-center justify-center bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl py-3.5 ml-2"
           >
             <Ionicons name="image" size={18} color="#6b7280" />
-            <Text className="text-gray-600 dark:text-gray-300 ml-2">Gallery</Text>
+            <Text className="text-gray-600 dark:text-gray-300 ml-2 font-medium">Gallery</Text>
           </TouchableOpacity>
         </View>
       )}

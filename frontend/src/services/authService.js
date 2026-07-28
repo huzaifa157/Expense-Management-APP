@@ -14,6 +14,20 @@ export const registerUser = async (name, email, password) => {
   });
 };
 
+export const forgotPassword = async (email) => {
+  return apiRequest("/auth/forgot-password", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+};
+
+export const resetPassword = async (email, code, newPassword) => {
+  return apiRequest("/auth/reset-password", {
+    method: "POST",
+    body: JSON.stringify({ email, code, newPassword }),
+  });
+};
+
 export const savePushToken = async (pushToken) => {
   return apiRequest("/auth/push-token", {
     method: "PUT",

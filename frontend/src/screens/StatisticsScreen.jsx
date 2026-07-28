@@ -96,7 +96,7 @@ export default function StatisticsScreen() {
       {breakdown.map((item) => (
         <View
           key={item.category}
-          className="bg-white dark:bg-gray-800 rounded-xl p-4 mb-3"
+          className="bg-white dark:bg-gray-800 rounded-2xl p-4 mb-3 shadow-sm border border-gray-100 dark:border-gray-700"
         >
           <View className="flex-row justify-between mb-2">
             <Text className="font-semibold text-gray-900 dark:text-white">
@@ -125,7 +125,7 @@ export default function StatisticsScreen() {
           Statistics
         </Text>
 
-        <View className="flex-row items-center justify-between bg-white dark:bg-gray-800 rounded-xl px-2 py-2 mb-4">
+        <View className="flex-row items-center justify-between bg-white dark:bg-gray-800 rounded-2xl px-2 py-2 mb-4 shadow-sm border border-gray-100 dark:border-gray-700">
           <TouchableOpacity onPress={() => setMonthOffset((prev) => prev - 1)} className="p-2">
             <Ionicons name="chevron-back" size={20} color="#2563eb" />
           </TouchableOpacity>
@@ -148,16 +148,22 @@ export default function StatisticsScreen() {
         </View>
 
         <View className="flex-row mb-6">
-          <View className="flex-1 bg-white dark:bg-gray-800 rounded-xl p-4 mr-2">
-            <Text className="text-gray-400 dark:text-gray-500 text-xs">Total Income</Text>
-            <Text className="text-green-600 text-xl font-bold mt-1">
+          <View className="flex-1 bg-white dark:bg-gray-800 rounded-2xl p-4 mr-2 shadow-sm border border-gray-100 dark:border-gray-700">
+            <View className="flex-row items-center mb-1">
+              <Ionicons name="arrow-down-circle" size={14} color="#16a34a" />
+              <Text className="text-gray-400 dark:text-gray-500 text-xs ml-1">Total Income</Text>
+            </View>
+            <Text className="text-green-600 text-xl font-bold">
               {formatCurrency(totalIncome)}
             </Text>
           </View>
 
-          <View className="flex-1 bg-white dark:bg-gray-800 rounded-xl p-4 ml-2">
-            <Text className="text-gray-400 dark:text-gray-500 text-xs">Total Expense</Text>
-            <Text className="text-red-500 text-xl font-bold mt-1">
+          <View className="flex-1 bg-white dark:bg-gray-800 rounded-2xl p-4 ml-2 shadow-sm border border-gray-100 dark:border-gray-700">
+            <View className="flex-row items-center mb-1">
+              <Ionicons name="arrow-up-circle" size={14} color="#ef4444" />
+              <Text className="text-gray-400 dark:text-gray-500 text-xs ml-1">Total Expense</Text>
+            </View>
+            <Text className="text-red-500 text-xl font-bold">
               {formatCurrency(totalExpense)}
             </Text>
           </View>

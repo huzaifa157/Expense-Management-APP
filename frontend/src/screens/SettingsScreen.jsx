@@ -10,6 +10,27 @@ import { CURRENCIES, useCurrency } from "../context/CurrencyContext";
 import { getExpenses, importExpenses } from "../services/expenseService";
 import CustomButton from "../components/CustomButton";
 
+function SettingsRow({ icon, iconBg, iconColor, label, onPress, withBorder }) {
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.7}
+      className={`flex-row items-center justify-between p-4 ${
+        withBorder ? "border-b border-gray-100 dark:border-gray-700" : ""
+      }`}
+    >
+      <View className="flex-row items-center flex-1">
+        <View className={`w-9 h-9 rounded-full items-center justify-center mr-3 ${iconBg}`}>
+          <Ionicons name={icon} size={16} color={iconColor} />
+        </View>
+        <Text className="font-semibold text-gray-900 dark:text-white">{label}</Text>
+      </View>
+
+      <Ionicons name="chevron-forward" size={18} color="#9ca3af" />
+    </TouchableOpacity>
+  );
+}
+
 const toCsvValue = (value) => `"${String(value ?? "").replace(/"/g, '""')}"`;
 
 const buildCsv = (expenses) => {
@@ -113,117 +134,140 @@ export default function SettingsScreen() {
       <ScrollView className="px-6 pt-4" contentContainerStyle={{ paddingBottom: 32 }}>
         <Text className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Settings</Text>
 
-        <View className="bg-white dark:bg-gray-800 rounded-xl p-5 mb-6">
-          <View className="w-16 h-16 rounded-full bg-blue-600 items-center justify-center mb-4">
+        <View className="bg-white dark:bg-gray-800 rounded-2xl p-5 mb-6 shadow-sm border border-gray-100 dark:border-gray-700 flex-row items-center">
+          <View className="w-16 h-16 rounded-full bg-blue-600 items-center justify-center mr-4">
             <Text className="text-white text-2xl font-bold">
               {user?.name?.charAt(0)?.toUpperCase() || "?"}
             </Text>
           </View>
 
-          <Text className="text-lg font-semibold text-gray-900 dark:text-white">
-            {user?.name}
-          </Text>
-          <Text className="text-gray-400 dark:text-gray-500">{user?.email}</Text>
+          <View className="flex-1">
+            <Text className="text-lg font-semibold text-gray-900 dark:text-white" numberOfLines={1}>
+              {user?.name}
+            </Text>
+            <Text className="text-gray-400 dark:text-gray-500 text-sm" numberOfLines={1}>
+              {user?.email}
+            </Text>
+          </View>
         </View>
 
-        <View className="bg-white dark:bg-gray-800 rounded-xl p-5 mb-6">
-          <View className="flex-row items-center justify-between">
-            <View>
-              <Text className="font-semibold text-gray-900 dark:text-white">Dark Mode</Text>
-              <Text className="text-gray-400 dark:text-gray-500 text-xs mt-1">
-                Switch between light and dark theme
-              </Text>
+        <Text className="text-gray-400 dark:text-gray-500 text-xs font-semibold uppercase mb-2 ml-1">
+          Preferences
+        </Text>
+        <View className="bg-white dark:bg-gray-800 rounded-2xl mb-6 shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+          <View className="flex-row items-center justify-between p-4 border-b border-gray-100 dark:border-gray-700">
+            <View className="flex-row items-center flex-1">
+              <View className="w-9 h-9 rounded-full bg-indigo-50 items-center justify-center mr-3">
+                <Ionicons name="moon" size={16} color="#6366f1" />
+              </View>
+              <View>
+                <Text className="font-semibold text-gray-900 dark:text-white">Dark Mode</Text>
+                <Text className="text-gray-400 dark:text-gray-500 text-xs mt-0.5">
+                  Switch between light and dark theme
+                </Text>
+              </View>
             </View>
 
             <Switch value={isDark} onValueChange={toggleTheme} />
           </View>
-        </View>
 
-        <View className="bg-white dark:bg-gray-800 rounded-xl p-5 mb-6">
-          <Text className="font-semibold text-gray-900 dark:text-white mb-3">Currency</Text>
+          <View className="p-4">
+            <View className="flex-row items-center mb-3">
+              <View className="w-9 h-9 rounded-full bg-emerald-50 items-center justify-center mr-3">
+                <Ionicons name="cash" size={16} color="#059669" />
+              </View>
+              <Text className="font-semibold text-gray-900 dark:text-white">Currency</Text>
+            </View>
 
-          <View className="flex-row flex-wrap">
-            {CURRENCIES.map((option) => (
-              <TouchableOpacity
-                key={option.code}
-                onPress={() => changeCurrency(option.code)}
-                className={`px-4 py-2 rounded-full border mr-2 mb-2 ${
-                  currency.code === option.code
-                    ? "bg-blue-600 border-blue-600"
-                    : "border-gray-300 dark:border-gray-600"
-                }`}
-              >
-                <Text
-                  className={
+            <View className="flex-row flex-wrap">
+              {CURRENCIES.map((option) => (
+                <TouchableOpacity
+                  key={option.code}
+                  onPress={() => changeCurrency(option.code)}
+                  className={`px-4 py-2 rounded-full border mr-2 mb-2 ${
                     currency.code === option.code
-                      ? "text-white"
-                      : "text-gray-600 dark:text-gray-300"
-                  }
+                      ? "bg-blue-600 border-blue-600"
+                      : "border-gray-300 dark:border-gray-600"
+                  }`}
                 >
-                  {option.symbol} {option.code}
-                </Text>
-              </TouchableOpacity>
-            ))}
+                  <Text
+                    className={
+                      currency.code === option.code
+                        ? "text-white"
+                        : "text-gray-600 dark:text-gray-300"
+                    }
+                  >
+                    {option.symbol} {option.code}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
           </View>
         </View>
 
-        <TouchableOpacity
-          onPress={() => navigation.navigate("Budgets")}
-          className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 rounded-xl mb-3 flex-row items-center justify-between"
-        >
-          <Text className="font-bold text-lg text-gray-900 dark:text-white">Budgets</Text>
-          <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
-        </TouchableOpacity>
+        <Text className="text-gray-400 dark:text-gray-500 text-xs font-semibold uppercase mb-2 ml-1">
+          Planning
+        </Text>
+        <View className="bg-white dark:bg-gray-800 rounded-2xl mb-6 shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+          <SettingsRow
+            icon="pie-chart"
+            iconBg="bg-blue-50"
+            iconColor="#2563eb"
+            label="Budgets"
+            onPress={() => navigation.navigate("Budgets")}
+            withBorder
+          />
+          <SettingsRow
+            icon="repeat"
+            iconBg="bg-purple-50"
+            iconColor="#8b5cf6"
+            label="Recurring Transactions"
+            onPress={() => navigation.navigate("Recurring")}
+          />
+        </View>
 
-        <TouchableOpacity
-          onPress={() => navigation.navigate("Recurring")}
-          className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 rounded-xl mb-4 flex-row items-center justify-between"
-        >
-          <Text className="font-bold text-lg text-gray-900 dark:text-white">
-            Recurring Transactions
-          </Text>
-          <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={handleExport}
-          className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 rounded-xl mb-4"
-        >
-          <Text className="text-center font-bold text-lg text-gray-900 dark:text-white">
-            Export Transactions (CSV)
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={handleBackup}
-          className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 rounded-xl mb-3"
-        >
-          <Text className="text-center font-bold text-lg text-gray-900 dark:text-white">
-            Backup (JSON)
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => setRestoreVisible(true)}
-          className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 rounded-xl mb-4"
-        >
-          <Text className="text-center font-bold text-lg text-gray-900 dark:text-white">
-            Restore from Backup
-          </Text>
-        </TouchableOpacity>
+        <Text className="text-gray-400 dark:text-gray-500 text-xs font-semibold uppercase mb-2 ml-1">
+          Data
+        </Text>
+        <View className="bg-white dark:bg-gray-800 rounded-2xl mb-6 shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+          <SettingsRow
+            icon="download-outline"
+            iconBg="bg-amber-50"
+            iconColor="#f59e0b"
+            label="Export Transactions (CSV)"
+            onPress={handleExport}
+            withBorder
+          />
+          <SettingsRow
+            icon="cloud-upload-outline"
+            iconBg="bg-cyan-50"
+            iconColor="#0891b2"
+            label="Backup (JSON)"
+            onPress={handleBackup}
+            withBorder
+          />
+          <SettingsRow
+            icon="cloud-download-outline"
+            iconBg="bg-teal-50"
+            iconColor="#0d9488"
+            label="Restore from Backup"
+            onPress={() => setRestoreVisible(true)}
+          />
+        </View>
 
         <TouchableOpacity
           onPress={handleLogout}
-          className="bg-red-500 p-4 rounded-xl"
+          activeOpacity={0.85}
+          className="bg-red-500 p-4 rounded-2xl shadow-sm"
         >
-          <Text className="text-white text-center font-bold text-lg">
+          <Text className="text-white text-center font-bold text-base tracking-wide">
             Logout
           </Text>
         </TouchableOpacity>
       </ScrollView>
 
       <Modal visible={restoreVisible} animationType="slide" transparent>
-        <View className="flex-1 bg-black/50 justify-end">
+        <View className="flex-1 justify-end" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
           <View className="bg-white dark:bg-gray-800 rounded-t-2xl p-6">
             <Text className="text-lg font-bold text-gray-900 dark:text-white mb-2">
               Restore from Backup

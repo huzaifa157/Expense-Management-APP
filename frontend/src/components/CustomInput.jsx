@@ -12,9 +12,9 @@ export default function CustomInput({
   return (
     <View className="mb-4">
       <TextInput
-        className={`w-full border rounded-xl p-4 text-gray-900 dark:text-white dark:bg-gray-800 ${
+        className={`w-full border rounded-2xl px-4 py-3.5 text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-800 ${
           multiline ? "h-24" : ""
-        } ${error ? "border-red-400" : "border-gray-300 dark:border-gray-700"}`}
+        } ${error ? "border-red-400" : "border-gray-200 dark:border-gray-700"}`}
         placeholder={placeholder}
         placeholderTextColor="#9ca3af"
         value={value}

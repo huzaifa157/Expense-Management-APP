@@ -16,6 +16,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { deleteExpense, getExpenses } from "../services/expenseService";
 import { useCurrency } from "../context/CurrencyContext";
 import { EXPENSE_CATEGORIES, INCOME_CATEGORIES } from "../constants/categories";
+import CategoryIcon from "../components/CategoryIcon";
 
 const ALL_CATEGORIES = [...new Set([...EXPENSE_CATEGORIES, ...INCOME_CATEGORIES])];
 
@@ -149,7 +150,8 @@ export default function HistoryScreen() {
 
           <TouchableOpacity
             onPress={cycleSort}
-            className="flex-row items-center bg-white dark:bg-gray-800 px-3 py-2 rounded-full border border-gray-200 dark:border-gray-700"
+            activeOpacity={0.8}
+            className="flex-row items-center bg-white dark:bg-gray-800 px-3 py-2 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm"
           >
             <Ionicons name={activeSort.icon} size={14} color="#2563eb" />
             <Text className="text-blue-600 text-xs font-semibold ml-1">
@@ -162,14 +164,14 @@ export default function HistoryScreen() {
           Tap to edit · Long press to delete
         </Text>
 
-        <View className="flex-row items-center bg-white dark:bg-gray-800 rounded-xl px-3 mt-3 border border-gray-200 dark:border-gray-700">
+        <View className="flex-row items-center bg-white dark:bg-gray-800 rounded-2xl px-3 mt-3 border border-gray-200 dark:border-gray-700 shadow-sm">
           <Ionicons name="search" size={16} color="#9ca3af" />
           <TextInput
             value={search}
             onChangeText={setSearch}
             placeholder="Search title or notes"
             placeholderTextColor="#9ca3af"
-            className="flex-1 px-2 py-3 text-gray-900 dark:text-white"
+            className="flex-1 px-2 py-3.5 text-gray-900 dark:text-white"
           />
           {!!search && (
             <TouchableOpacity onPress={() => setSearch("")}>
@@ -291,22 +293,27 @@ export default function HistoryScreen() {
           <TouchableOpacity
             onPress={() => navigation.navigate("EditTransaction", { expense: item })}
             onLongPress={() => handleDelete(item)}
-            className="flex-row justify-between items-center bg-white dark:bg-gray-800 mb-3 p-4 rounded-xl"
+            activeOpacity={0.7}
+            className="flex-row items-center bg-white dark:bg-gray-800 mb-3 p-3.5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700"
           >
-            <View className="flex-1 pr-3">
-              <Text className="font-semibold text-gray-900 dark:text-white">{item.title}</Text>
-              <Text className="text-gray-400 dark:text-gray-500 text-xs">
+            <CategoryIcon category={item.category} />
+
+            <View className="flex-1 px-3">
+              <Text className="font-semibold text-gray-900 dark:text-white" numberOfLines={1}>
+                {item.title}
+              </Text>
+              <Text className="text-gray-400 dark:text-gray-500 text-xs mt-0.5">
                 {item.category} · {new Date(item.date).toLocaleDateString()}
               </Text>
               {!!item.notes && (
-                <Text className="text-gray-400 dark:text-gray-500 text-xs mt-1" numberOfLines={2}>
+                <Text className="text-gray-400 dark:text-gray-500 text-xs mt-1" numberOfLines={1}>
                   {item.notes}
                 </Text>
               )}
             </View>
 
             <Text
-              className={`font-bold ${
+              className={`font-bold text-base ${
                 item.type === "income" ? "text-green-600" : "text-red-500"
               }`}
             >
@@ -317,9 +324,14 @@ export default function HistoryScreen() {
         )}
         ListEmptyComponent={
           !loading && (
-            <Text className="text-center text-gray-400 dark:text-gray-500 mt-4">
-              No transactions match your filters
-            </Text>
+            <View className="items-center mt-8">
+              <View className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 items-center justify-center mb-3">
+                <Ionicons name="search-outline" size={28} color="#9ca3af" />
+              </View>
+              <Text className="text-center text-gray-400 dark:text-gray-500">
+                No transactions match your filters
+              </Text>
+            </View>
           )
         }
       />

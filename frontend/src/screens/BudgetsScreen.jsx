@@ -65,8 +65,11 @@ export default function BudgetsScreen() {
   return (
     <SafeAreaView className="flex-1 bg-gray-50 dark:bg-gray-900">
       <View className="px-6 pt-4 pb-2 flex-row items-center">
-        <TouchableOpacity onPress={() => navigation.goBack()} className="mr-3">
-          <Ionicons name="arrow-back" size={24} color="#2563eb" />
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          className="w-9 h-9 rounded-full bg-white dark:bg-gray-800 items-center justify-center mr-3 shadow-sm border border-gray-100 dark:border-gray-700"
+        >
+          <Ionicons name="arrow-back" size={18} color="#2563eb" />
         </TouchableOpacity>
         <Text className="text-2xl font-bold text-gray-900 dark:text-white">Budgets</Text>
       </View>
@@ -86,7 +89,7 @@ export default function BudgetsScreen() {
           return (
             <View
               key={category}
-              className="bg-white dark:bg-gray-800 rounded-xl p-4 mb-3"
+              className="bg-white dark:bg-gray-800 rounded-2xl p-4 mb-3 shadow-sm border border-gray-100 dark:border-gray-700"
             >
               <View className="flex-row items-center justify-between mb-2">
                 <Text className="font-semibold text-gray-900 dark:text-white">{category}</Text>
@@ -132,12 +135,13 @@ export default function BudgetsScreen() {
                   placeholder="Monthly limit"
                   placeholderTextColor="#9ca3af"
                   keyboardType="decimal-pad"
-                  className="flex-1 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 mr-2 text-gray-900 dark:text-white"
+                  className="flex-1 border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 rounded-xl px-3 py-2.5 mr-2 text-gray-900 dark:text-white"
                 />
 
                 <TouchableOpacity
                   onPress={() => handleSave(category)}
-                  className="bg-blue-600 px-4 py-2 rounded-lg"
+                  activeOpacity={0.85}
+                  className="bg-blue-600 px-4 py-2.5 rounded-xl shadow-sm"
                 >
                   <Text className="text-white font-semibold">Save</Text>
                 </TouchableOpacity>
